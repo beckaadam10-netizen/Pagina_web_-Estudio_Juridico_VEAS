@@ -156,6 +156,59 @@
             color: var(--gold-bright);
         }
 
+        .nav-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: rgba(17, 22, 29, 0.45);
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .nav-toggle span,
+        .nav-toggle span::before,
+        .nav-toggle span::after {
+            content: '';
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--gold-bright);
+            border-radius: 2px;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .nav-toggle span {
+            position: relative;
+        }
+
+        .nav-toggle span::before {
+            position: absolute;
+            top: -6px;
+        }
+
+        .nav-toggle span::after {
+            position: absolute;
+            top: 6px;
+        }
+
+        .nav-toggle.is-open span {
+            background: transparent;
+        }
+
+        .nav-toggle.is-open span::before {
+            top: 0;
+            transform: rotate(45deg);
+        }
+
+        .nav-toggle.is-open span::after {
+            top: 0;
+            transform: rotate(-45deg);
+        }
+
         .nav-login:hover,
         .nav-login:focus-visible {
             color: #16110a;
@@ -1310,11 +1363,43 @@
             }
 
             .topbar {
-                position: static;
+                position: sticky;
+            }
+
+            .nav-toggle {
+                display: inline-flex;
             }
 
             nav {
                 display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0;
+                padding: 0.5rem 0;
+                background: rgba(9, 12, 16, 0.97);
+                border-bottom: 1px solid rgba(239, 181, 72, 0.18);
+            }
+
+            nav.is-open {
+                display: flex;
+            }
+
+            nav a {
+                width: 100%;
+                padding: 0.85rem var(--nav-gutter, 1.1rem);
+            }
+
+            nav a:not(.nav-login)::after {
+                display: none;
+            }
+
+            .nav-login {
+                width: calc(100% - 2.2rem);
+                margin: 0.5rem 1.1rem 0;
             }
 
             .hero {
@@ -1348,7 +1433,10 @@
                 <img src="/Imagenes/logo.png" alt="Logo Vidal Escalante & Asociados">
                 VIDAL ESCALANTE & ASOCIADOS
             </a>
-            <nav>
+            <button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mainNav">
+                <span></span>
+            </button>
+            <nav id="mainNav">
                 <a href="#inicio" class="active">Inicio</a>
                 <a href="{{ route('nosotros') }}">Nosotros</a>
                 <a href="{{ route('servicios') }}">Servicios</a>
@@ -1859,6 +1947,37 @@
 
             form.reset();
             closeModal();
+        });
+    })();
+
+    (function () {
+        var toggle = document.getElementById('navToggle');
+        var nav = document.getElementById('mainNav');
+
+        if (!toggle || !nav) {
+            return;
+        }
+
+        function closeNav() {
+            nav.classList.remove('is-open');
+            toggle.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
+
+        toggle.addEventListener('click', function () {
+            var isOpen = nav.classList.toggle('is-open');
+            toggle.classList.toggle('is-open', isOpen);
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        nav.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', closeNav);
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeNav();
+            }
         });
     })();
 </script>
